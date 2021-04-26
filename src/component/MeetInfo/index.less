@@ -101,23 +101,71 @@
       display: flex;
       flex-direction: row;
       justify-content: space-evenly;
-
+      &.single {
+        justify-content: center;
+      }
     }
 
   }
 
 }
 .meet-info-right-item {
+  width: 134px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   //padding: 18px;
 
+  .withe-line-top {
+    position: absolute;
+    top: -5px;
+    height: 13px;
+    width: 120%;
+    background-color: #fff;
+    z-index: 999;
+  }
+
+  .withe-line-bottom {
+    position: absolute;
+    bottom: -5px;
+    height: 13px;
+    width: 120%;
+    background-color: #fff;
+    z-index: 999;
+  }
+
+  .withe-line-right {
+    position: absolute;
+    right: -5px;
+    height: 120%;
+    width: 13px;
+    background-color: #fff;
+    z-index: 999;
+  }
+
+  .withe-line-left {
+    position: absolute;
+    left: -5px;
+    height: 120%;
+    width: 13px;
+    background-color: #fff;
+    z-index: 999;
+  }
+
   cursor: pointer;
+
   .right-item-text {
     font-size: @right-font-size;
     margin-top: 8px;
+  }
+
+  &.share {
+    padding: 10px;
+    margin: 0;
+    line-height: unset;
+    border: 1px solid transparent; //自定义边框
+    background-color: #fff;
   }
 
 }

@@ -7,8 +7,7 @@ export default {
     'pages/MeetForm/index',
     'pages/RoomDetail/index',
     'pages/UserAuth/index',
-    'pages/MeetDetail/index',
-    'pages/Setting/index',
+    'pages/MeetDetail/index'
   ],
   window: {
     backgroundTextStyle: 'light',
@@ -32,13 +31,7 @@ export default {
         "iconPath": "images/MeetList.png",
         "pagePath": "pages/MeetList/index",
         "text": "会议预约"
-      },
-      // {
-      //   "selectedIconPath": "images/SettingSelected.png",
-      //   "iconPath": "images/Setting.png",
-      //   "pagePath": "pages/Setting/index",
-      //   "text": "设置"
-      // },
+      }
     ]
   }
 }

@@ -73,10 +73,11 @@ export default async <REQ, RES>(options: OptionsType<REQ>) => {
     // console.log("1");
     await loginAndTokenOrRedirect();
   }
-  let rres;
+  let rres: RES;
   try {
     rres = await realRequest<REQ, RES>(options);
-    console.log(rres);
+    // console.log(rres);
+    // @ts-ignore
     if (rres.code == "A0220") {
       await loginAndTokenOrRedirect();
       rres = await realRequest<REQ, RES>(options);
@@ -90,5 +91,6 @@ export default async <REQ, RES>(options: OptionsType<REQ>) => {
     // Taro.hideLoading();
   }
 
+  // @ts-ignore
   return rres;
 };

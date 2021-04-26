@@ -1,6 +1,6 @@
 Component({
   properties: {
-    // ring | link | double-left-arrow | date | delete | meetingName | edit | creator | arrow-right | arrow-left | expand
+    // Join | ring | link | double-left-arrow | date | delete | meetingName | edit | creator | arrow-right | arrow-left | expand
     name: {
       type: String,
     },

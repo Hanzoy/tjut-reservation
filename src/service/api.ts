@@ -54,6 +54,8 @@ export type MyMeetInfo = {
   meetingName : string,
   date : string,
   time : string,
+  content: string;
+  remind: boolean,
   status: "未开始" | "进行中" | "已结束"
 }
 export type GetMyRevRes = BaseRes<{
@@ -126,6 +128,7 @@ export type MeetParticipant = {
 
 export type GetRevRes = BaseRes<{
   isCreator : boolean,
+  isParticipant: boolean;
   id : number,
   name : string,
   creator :string,
@@ -134,6 +137,7 @@ export type GetRevRes = BaseRes<{
   time : string,
   content : string,
   status: "未开始" | "进行中" | "已结束",
+  remind: boolean,
   participant: MeetParticipant[]
 }>
 
@@ -176,7 +180,6 @@ export const getMyRev = async (req: GetMyRevReq) =>
 )
 
 export type RemindRevReq = {
-  token : string,
   id : number,
   remind : boolean
 }
@@ -187,3 +190,48 @@ export const remindRev = async (req: RemindRevReq) =>
     method: "POST",
     data: req
   });
+
+export type DeleteRevReq = {
+  id: number;
+  remark: string;
+};
+
+export const deleteRev = async (req: DeleteRevReq) =>
+  await Request<DeleteRevReq, BaseRes<any>>({
+    url: "/deleteReservation",
+    method: "POST",
+    data: req
+  });
+
+
+export type ModifyRevReq = {
+  id : number,
+  name : string,
+  date : string,
+  startTime: string,
+  endTime : string,
+  content : string
+}
+
+export type ModifyRevRes = BaseRes<{}>;
+
+export const modifyRev = async (req: ModifyRevReq) =>
+  await Request<ModifyRevReq, ModifyRevRes>({
+    url: "/modifyReservation",
+    method: "POST",
+    data: req
+  });
+
+export type JoinRevReq = {
+  id: number;
+  join: boolean;
+};
+
+export type JoinRevRes = BaseRes<{}>;
+
+export const joinRev = async (req: JoinRevReq) =>
+  await Request<JoinRevReq, JoinRevRes>({
+    url: "/joinReservation",
+    method: "POST",
+    data: req
+  })

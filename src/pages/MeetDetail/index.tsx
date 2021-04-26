@@ -1,4 +1,4 @@
-import Taro, {useRouter, useDidShow} from "@tarojs/taro";
+import Taro, {useRouter, useDidShow, useShareAppMessage} from "@tarojs/taro";
 import {Image, View} from "@tarojs/components";
 import {getRev, GetRevRes} from "../../service/api";
 import {useState} from "react";
@@ -7,15 +7,24 @@ import "./index.less"
 
 const MeetDetail: Taro.FunctionComponent = () => {
 
-  const {params} = useRouter();
-  const meetId = params.meetid;
-  useDidShow(async () => {
+  useShareAppMessage(res => {
+    if (res.from === 'button') {
+      console.log(res.target)
+    }
+    return {
+      title: data?.data.name,
+      path: `/pages/MeetDetail/index?meetid=${data?.data.id}`,
+      imageUrl: "../../images/logo.png"
+    }
+  })
+
+  const load = async () => {
     await Taro.showLoading();
     // await loginAndTokenOrRedirect();
     const res = await getRev({
       id: parseInt(meetId!)
     })
-    await Taro.hideLoading();
+    Taro.hideLoading();
 
     if (res.code == "A0300") {
       await Taro.showToast({
@@ -26,16 +35,28 @@ const MeetDetail: Taro.FunctionComponent = () => {
       setTimeout(() => {
         Taro.navigateBack();
       }, 500)
+    } else if (res.code != "00000") {
+      await Taro.showToast({
+        title: "会议已删除",
+        icon: "none",
+        duration: 1000
+      });
+      await Taro.reLaunch({
+        url: "../MeetList/index"
+      });
+      // setTimeout(() => {
+      //   Taro.redirectTo({
+      //     url: "../MeetList/index"
+      //   });
+      // }, 500)
     }
-    // const pages = getCurrentPages();
-    // const current = pages[pages.length - 1];
-    // const channel = current.getOpenerEventChannel();
-    // channel.emit("acceptDataFromOpenedPage", {d: "ok"})
-    //
-    //
-    // Taro.navigateBack();
     setData(res);
-    // console.log(res);
+  }
+
+  const {params} = useRouter();
+  const meetId = params.meetid;
+  useDidShow(async () => {
+    await load();
   })
 
   const [data, setData] = useState<GetRevRes>();
@@ -45,6 +66,7 @@ const MeetDetail: Taro.FunctionComponent = () => {
       <View className="meet-info">
         <MeetInfo
           {...data?.data!}
+          reload={async () => await load()}
         />
       </View>
 

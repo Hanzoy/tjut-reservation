@@ -1,8 +1,9 @@
 import Taro, {useDidShow, useRouter} from "@tarojs/taro";
 import {Button, Form, Input, Picker, Text, View} from "@tarojs/components";
 import './index.less'
-import {getRevs, MeetingRoom, postRev} from "../../service/api";
+import {getRev, getRevs, MeetingRoom, modifyRev, postRev} from "../../service/api";
 import {useState} from "react";
+import {REMIND_TMPLS} from "../../config";
 
 const MeetForm: Taro.FunctionComponent = () => {
   const [roomList, setRoomList] = useState<MeetingRoom[]>([]);
@@ -18,13 +19,42 @@ const MeetForm: Taro.FunctionComponent = () => {
 
 
   const {params} = useRouter();
+  const isEdit = !!params.meetid;
   useDidShow(async () => {
     Taro.showLoading();
+    let date = new Date();
+    let year = (date.getFullYear()).toString();
+    let month = (date.getMonth() + 1).toString()
+    if (params.meetid) {
+      // console.log(isEdit);
+      // console.log(params.meetname!);
+      // console.log(params.meetdate!);
+      // console.log(params.meetstarttime!);
+      // console.log(params.meetendtime!);
+      // console.log(params.meetcontent!);
+      // setName(params.meetname!);
+      // setDate(params.meetdate!);
+      year = params.pdate!.split("-")[0];
+      month = params.pdate!.split("-")[1];
+
+      const rev = await getRev({
+        id: parseInt(params.meetid)
+      });
+      setName(rev.data.name);
+      setStartTime(rev.data.time.split("-")[0]);
+      setEndTime(rev.data.time.split("-")[1]);
+      setContent(rev.data.content);
+
+      // setStartTime(params.meetstarttime!);
+      // setEndTime(params.meetendtime!);
+      // setContent(params.meetcontent!);
+
+
+    }
     // await loginAndTokenOrRedirect();
-    const date = new Date();
     const res = await getRevs({
-      year: (date.getFullYear()).toString(),
-      month: (date.getMonth() + 1).toString()
+      year: year,
+      month: month
     });
 
     setRoomList(res.data.meetingRoom);
@@ -38,13 +68,22 @@ const MeetForm: Taro.FunctionComponent = () => {
       setRoomText(rooml.find(it => it.roomid == parseInt(roomid!))!.name);
       setRoomId(parseInt(roomid!));
     }
+
+    if (params.roomname) {
+      const room = rooml.find(it => it.name == params.roomname);
+
+      setRoomText(room.name);
+      setRoomId(room.roomid)
+    }
+
     const pdate = params.pdate; //yyyy-mm-dd
     if (pdate) {
       setDate(pdate);
     }
 
+
     Taro.hideLoading()
-  })
+  });
 
 
 
@@ -124,19 +163,25 @@ const MeetForm: Taro.FunctionComponent = () => {
       remind : true
     };
     await Taro.requestSubscribeMessage({
-      tmplIds : [ 'zoNiVDerNHmRIxEqslSyanW9RftA6jjS66E2w8EVYaM',
-                  'Sx99rGlCxNt580Zjpu1sNleOoloXV4M2L55YLScM-xI',
-                  '0JMcKVMwcxTR30FccNilNA5ETndnWXUheHG4t_lFcRY'],
+      tmplIds : REMIND_TMPLS,
       fail : ()=>{
         req.remind = false;
       }
     })
     await Taro.showLoading();
-    const res = await postRev(req)
-    console.log(res);
+    let res;
+    if (isEdit) {
+      res = await modifyRev({
+        id: parseInt(params.meetid!),
+        ...req
+      });
+    } else {
+      res = await postRev(req);
+    }
+    // console.log(res);
     if (res.code == "00000") {
       await Taro.showToast({
-        title: "创建成功",
+        title: "请求成功",
         duration: 1000
       })
       setTimeout(() => {
@@ -145,7 +190,7 @@ const MeetForm: Taro.FunctionComponent = () => {
       }, 1000)
     } else {
       await Taro.showToast({
-        title: "创建失败" + res.message,
+        title: "请求失败" + res.message,
         icon: "none",
         duration: 1000
       })
@@ -165,6 +210,7 @@ const MeetForm: Taro.FunctionComponent = () => {
             type='text'
             placeholder='必填'
             className="form-item-right"
+            value={name}
             onInput={(e) => {
               setName(e.detail.value);
             }}/>
@@ -236,16 +282,17 @@ const MeetForm: Taro.FunctionComponent = () => {
             type='text'
             placeholder='必填'
             className="form-item-right"
+            value={content}
             onInput={(e) => {
               setContent(e.detail.value);
             }}/>
         </View>
         <View className="divider"/>
-        <Button formType={"submit"} type="primary" style={{margin: "16px",backgroundColor: "#23a9f4"}}>创建</Button>
+        <Button formType={"submit"} type="primary" style={{margin: "16px", backgroundColor: "#23a9f4"}}>{isEdit?"修改":"创建"}</Button>
 
       </Form>
     </View>
-  )
+  );
 };
 
 export default MeetForm;
